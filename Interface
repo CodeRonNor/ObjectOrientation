@@ -1,0 +1,74 @@
+import java.util.Scanner;
+
+public class Interface {
+
+    public Interface() {
+
+    }
+    private final String introMessage = "Let's begin!\nYou can either guess a letter or the whole word.\n"
+            + "You begin with 10 lives and for each failed trial, one will be taken away.\n"
+            + "What is your first guess?: ";
+
+    public void intro(Hangman hangMan) {
+
+        System.out.println("Hello, and welcome to Hangman!\nWould you like to get a random word (r) or enter one yourself (y)?");
+        Scanner scanner = new Scanner(System.in);
+        String answer = scanner.next();
+        while (!(answer.equals("r") || answer.equals("y"))) {
+            System.out.println("Please pick one of the options: ");
+            answer = scanner.next();
+        }
+        switch (answer) {
+            case "r":
+                System.out.println();
+                System.out.println("Great! The word has been chosen.");
+                System.out.println(introMessage);
+                hangMan.play(hangMan);
+                break;
+            case "y":
+                System.out.println();
+                System.out.println("Great! Please type in your word: ");
+                hangMan.setHangman(scanner.next().toLowerCase());
+                System.out.println(introMessage);
+                hangMan.play(hangMan);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void currentGame(Hangman hangMan) {
+        assert hangMan != null : "Object should be initialised";
+        System.out.println(hangMan.getCurrent() + " " + hangMan.getLives() + " ♥" + " Letters you've already tried: " + hangMan.getAlreadyTried());
+    }
+
+    public void cases(Hangman hangMan) {
+        assert hangMan != null : "Object should be initialised";
+        Scanner scanner = new Scanner(System.in);
+        String answer = scanner.next().toLowerCase();
+        switch (hangMan.decision(answer)) {
+            case "win":
+                System.out.println("Congratulations!\nYou won!\n" + hangMan.getCurrent() + " " + hangMan.getLives() + " ♥");
+                hangMan.gameOver();
+                break;
+            case "correct":
+                System.out.println("Yes! You got it right.");
+                currentGame(hangMan);
+                break;
+            case "wrong":
+                System.out.println("Nope, that's not in there!");
+                currentGame(hangMan);
+                break;
+            case "lose":
+                System.out.println("No more lives! " + hangMan.getLives() + " ♥ Game Over.\nThe word was: " + hangMan.getHangman());
+                hangMan.gameOver();
+                break;
+            case "weird":
+                System.out.println("Your input has to be either a character, or a whole word");
+                currentGame(hangMan);
+                break;
+            default:
+                break;
+        }
+    }
+}
