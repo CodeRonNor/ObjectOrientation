@@ -1,0 +1,22 @@
+
+import java.util.Scanner;
+
+/**
+ *
+ * @author Ron
+ */
+public class Main {
+
+    public static void main(String[] args) {
+        
+        Scanner scanner = new Scanner(System.in);
+        do{
+        Interface interFace = new Interface();
+        Hangman hangMan = new Hangman();
+        interFace.intro(hangMan);
+            System.out.println("Would you like to play another game? (yes)");
+        }
+        while(scanner.next().equals("yes"));
+        System.out.println("Thank you for playing."); 
+    }
+}
