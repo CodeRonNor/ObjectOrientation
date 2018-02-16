@@ -1,0 +1,194 @@
+
+public class Hangman {
+
+    private String hangman;
+    private int lives;
+    private String alreadyTried = "";
+    private StringBuilder current;
+
+    public Hangman(String hangman) {
+        this.lives = 10;
+        this.hangman = hangman;
+    }
+
+    public Hangman() {
+        this.lives = 10;
+        WordReader wr = new WordReader("src/words.txt");
+        this.hangman = wr.getWord();
+    }
+
+    /**
+     * @return the hangman
+     */
+    public String getHangman() {
+        return hangman;
+    }
+
+    /**
+     * @param hangman the hangman to set
+     */
+    public void setHangman(String hangman) {
+        this.hangman = hangman;
+    }
+
+    public String getAlreadyTried() {
+        return this.alreadyTried;
+    }
+
+    public void setAlreadyTried(String answer) {
+        assert answer != null : "String should be initialised";
+        if (!alreadyTried(answer)) {
+            this.alreadyTried += " " + answer;
+        }
+    }
+
+    /**
+     * @return the lives
+     */
+    public int getLives() {
+        return lives;
+    }
+
+    /**
+     * @param lives the lives to set
+     */
+    public void setLives(int lives) {
+        this.lives = lives;
+    }
+
+    /**
+     * @return the current
+     */
+    public StringBuilder getCurrent() {
+        return current;
+    }
+
+    /**
+     * @param current the current to set
+     */
+    public void setCurrent(StringBuilder current) {
+        assert current != null : "StringBuilder should be initialised";
+        this.current = current;
+    }
+
+    /**
+     * initializes the game
+     *
+     * @param hangMan
+     */
+    public void play(Hangman hangMan) {
+        assert hangMan != null : "Object should be initialised";
+        Interface interFace = new Interface();
+        setCurrent(initializeDots());
+        interFace.currentGame(hangMan);
+        while (getLives() != -1) {
+            interFace.cases(hangMan);
+        }
+    }
+
+    /**
+     * taking the hangman word and making it into dots for the gamer to view
+     *
+     * @return
+     */
+    private StringBuilder initializeDots() {
+        setCurrent(new StringBuilder(hangman.length()));
+        for (int i = 0; i < hangman.length(); i++) {
+            getCurrent().append(".");
+        }
+        return getCurrent();
+    }
+
+    /**
+     * Depending on the gamers answer, decides what to do and progresses the
+     * game
+     *
+     * @param answer users input
+     * @return
+     */
+    public String decision(String answer) {
+        assert answer != null : "String should be initialised";
+        if (!checkLength(answer)) {
+            return "weird";
+        }
+        if (answer.equals(hangman)) {
+            win();
+            return "win";
+        }
+        if (answer.length() == hangman.length() && !answer.equals(hangman)) {
+            setLives(lives - 1);
+            return "wrong";
+        }
+        for (int i = 0; i < hangman.length(); i++) {
+            if (answer.charAt(0) == hangman.charAt(i)) {
+                correct(answer);
+                if (isFinished()) {
+                    return "win";
+                }
+                return "correct";
+            }
+        }
+
+        for (int i = 0; i < hangman.length(); i++) {
+            if (answer.charAt(0) != hangman.charAt(i) && lives > 0) {
+                if (!alreadyTried(answer)) {
+                    setLives(lives - 1);
+                }
+                if (lives == 0) {
+                    return "lose";
+                }
+                setAlreadyTried(answer);
+                return "wrong";
+            }
+        }
+        return "lose";
+    }
+
+    /**
+     * Checks if the user entered a correct letter
+     *
+     * @param answer
+     */
+    private void correct(String answer) {
+        assert answer != null : "String should be initialised";
+        int index = hangman.indexOf(answer.charAt(0));
+        if (index >= 0) {
+            for (; index >= 0; index = hangman.indexOf(answer.charAt(0), index + 1)) {
+                current.setCharAt(index, answer.charAt(0));
+            }
+        }
+    }
+
+    private void win() {
+        setCurrent(current.replace(0, current.length(), hangman));
+    }
+
+    private boolean isFinished() {
+        return current.toString().equals(hangman);
+    }
+
+    private boolean checkLength(String answer) {
+        assert answer != null : "String should be initialised";
+        return (answer.length() == 1 || answer.length() == hangman.length());
+    }
+
+    /**
+     * Checks if the user already tried that letter
+     *
+     * @param answer
+     * @return
+     */
+    private boolean alreadyTried(String answer) {
+        for (int i = 0; i < alreadyTried.length(); i++) {
+            if (answer.charAt(0) == alreadyTried.charAt(i)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void gameOver() {
+        setLives(-1);
+    }
+
+}
